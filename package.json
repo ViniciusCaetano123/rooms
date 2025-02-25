@@ -3,25 +3,34 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "dev": "tsx watch src/index.ts",
-    "start": "node dist/index.js",
+    "dev": "tsx  watch --env-file=.env src/index.ts ",
+    "start": "node --env-file=.env dist/index.js",
     "build": "tsup"
   },
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@fastify/cors": "^10.1.0",
     "@fastify/swagger": "^9.4.2",
     "@fastify/swagger-ui": "^5.2.2",
     "@fastify/websocket": "^11.0.2",
+    "bcryptjs": "^3.0.2",
+    "drizzle-orm": "^0.39.3",
     "fastify": "^5.2.1",
     "fastify-type-provider-zod": "^4.0.2",
+    "jsonwebtoken": "^9.0.2",
+    "pg": "^8.13.3",
+    "postgres": "^3.4.5",
     "zod": "^3.24.2"
   },
   "devDependencies": {
+    "@types/jsonwebtoken": "^9.0.9",
     "@types/node": "^22.13.5",
+    "@types/pg": "^8.11.11",
     "@types/ws": "^8.5.14",
-    "tsup": "^8.3.6",
+    "drizzle-kit": "^0.30.4",
+    "tsup": "^2.0.3",
     "tsx": "^4.19.3",
     "typescript": "^5.7.3"
   }
