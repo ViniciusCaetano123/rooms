@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { FastifyPluginAsyncZod } from 'fastify-type-provider-zod';
 import { jwtAuth } from '../auth/jwtAuth';
-import {create,invite} from '../controllers/room';
+import {create,invite,rooms} from '../controllers/room';
 const plugin: FastifyPluginAsyncZod = async function (fastify, _opts) {
   fastify.route({
     method: 'POST',
@@ -28,7 +28,15 @@ const plugin: FastifyPluginAsyncZod = async function (fastify, _opts) {
     preHandler: jwtAuth,
     handler: invite,
   });
- 
+  fastify.route({
+    method: 'GET',
+    url: '/rooms',   
+    schema: {
+      tags: ['room'],         
+    },
+    preHandler: jwtAuth,
+    handler: rooms,
+  });
 };
 
 

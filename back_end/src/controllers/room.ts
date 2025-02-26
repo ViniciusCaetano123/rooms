@@ -15,43 +15,52 @@ interface RoomInviteBody {
 const create = async (req: FastifyRequest, reply: FastifyReply) => {
     try {
         const { nome } = req.body as RoomBody;
-        const user = req.user;
+        const user = req.user as User;
         if (!nome) {
             return reply.status(400).send({ error: "Nome da sala é obrigatório" });
         }
-        const room = await db.insert(salas).values({ nome, "idUsuario": user?.id || '' }).returning();
+        const room = await db.insert(salas).values({ nome, "idUsuario": user.id || '' }).returning();
         
         return reply.status(201).send({ message: "Sala cadastrada com sucesso", "idSala":room[0].id }); 
     } catch (error) {
         return reply.status(500).send({ error: "Erro interno do servidor" });
     }
 }
-
-const invite = async (req: FastifyRequest, reply: FastifyReply) => {
-    try {
-        const { idSala, emailConvidado } = req.body as RoomInviteBody;
-        console.log(idSala,emailConvidado)
+const rooms = async (req: FastifyRequest, reply: FastifyReply) => {
+    try {       
         const user = req.user as User;
-        if(user.email == emailConvidado){
-            return reply.status(400).send({ error: "Você não pode convidar para você mesmo" });
-        }
-        const resultUsuarioConvidado = await db.select({id:usuarios.id,email:usuarios.email}).from(usuarios).where(eq(usuarios.email,emailConvidado));
-        console.log(resultUsuarioConvidado)
-        if(resultUsuarioConvidado.length === 0){
-            return reply.status(400).send({ error: "Usuário não encontrado" });
-        }
-        console.log(emailConvidado)
-        const [usuarioConvidado] = resultUsuarioConvidado;  
-        console.log(usuarioConvidado)     
-        const salaConvidado = await db.insert(salaConvidados).values({ salaId: idSala, convidadoIdUsuario: usuarioConvidado.id,status:"pendente" }).returning();
-
-        console.log(usuarioConvidado)
-        return reply.status(200).send({ salaConvidado });
+        
+        const roomsIdUsuario = await db.select().from(salas).where(eq(salas.idUsuario,user.id));
+   
+        return reply.status(201).send({"dados":roomsIdUsuario }); 
     } catch (error) {
         console.log(error)
         return reply.status(500).send({ error: "Erro interno do servidor" });
     }
 }
+const invite = async (req: FastifyRequest, reply: FastifyReply) => {
+    try {
+        const { idSala, emailConvidado } = req.body as RoomInviteBody;
+     
+        const user = req.user as User;
+        if(user.email == emailConvidado){
+            return reply.status(400).send({ error: "Você não pode convidar para você mesmo" });
+        }
+        const resultUsuarioConvidado = await db.select({id:usuarios.id,email:usuarios.email}).from(usuarios).where(eq(usuarios.email,emailConvidado));
+
+        if(resultUsuarioConvidado.length === 0){
+            return reply.status(400).send({ error: "Usuário não encontrado" });
+        }
+
+        const [usuarioConvidado] = resultUsuarioConvidado;  
+   
+        const salaConvidado = await db.insert(salaConvidados).values({ salaId: idSala, convidadoIdUsuario: usuarioConvidado.id,status:"pendente" }).returning();
+    
+        return reply.status(200).send({ salaConvidado });
+    } catch (error) {   
+        return reply.status(500).send({ error: "Erro interno do servidor" });
+    }
+}
 
 
-export { create, invite };
+export { create, invite, rooms };
