@@ -1,0 +1,12 @@
+services:
+  
+  db:
+    image: postgres
+    restart: always   
+    container_name: pg-rooms
+
+    environment:
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: connect
+    ports:
+      - "5432:5432"
